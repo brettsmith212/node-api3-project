@@ -2,7 +2,6 @@ const express = require("express");
 const Posts = require("../posts/posts-model");
 const Users = require("./users-model");
 const {
-  logger,
   validatePost,
   validateUser,
   validateUserId,
@@ -14,7 +13,6 @@ const {
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  // RETURN AN ARRAY WITH ALL THE USERS
   try {
     let users = await Users.get();
     console.log(users);
@@ -25,15 +23,13 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", validateUserId, (req, res) => {
-  // RETURN THE USER OBJECT
-  // this needs a middleware to verify user id
   let user = req.user;
   res.status(200).json(user);
 });
 
-router.post("/", (req, res) => {
-  // RETURN THE NEWLY CREATED USER OBJECT
-  // this needs a middleware to check that the request body is valid
+router.post("/", validateUser, (req, res) => {
+  let newUser = req.newUser;
+  res.status(200).json(newUser);
 });
 
 router.put("/:id", (req, res) => {
