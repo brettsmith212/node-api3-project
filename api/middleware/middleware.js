@@ -22,16 +22,15 @@ async function validateUser(req, res, next) {
   if (!name) {
     res.status(400).json({ message: "missing required name field" });
   }
-  let newUser = await Users.insert(req.body);
-  if (!newUser) {
-    res.status(500).json({ message: "error adding new user" });
-  }
-  req.newUser = newUser;
   next();
 }
 
 function validatePost(req, res, next) {
-  // DO YOUR MAGIC
+  let { text } = req.body;
+  if (!text) {
+    res.status(400).json({ message: "missing required text field" });
+  }
+  next();
 }
 
 // do not forget to expose these functions to other modules
