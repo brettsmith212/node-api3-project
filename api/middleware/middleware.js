@@ -21,16 +21,18 @@ async function validateUser(req, res, next) {
   let { name } = req.body;
   if (!name) {
     res.status(400).json({ message: "missing required name field" });
+  } else {
+    next();
   }
-  next();
 }
 
 function validatePost(req, res, next) {
   let { text } = req.body;
   if (!text) {
     res.status(400).json({ message: "missing required text field" });
+  } else {
+    next();
   }
-  next();
 }
 
 // do not forget to expose these functions to other modules

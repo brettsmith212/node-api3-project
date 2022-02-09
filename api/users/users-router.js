@@ -2,7 +2,6 @@ const express = require("express");
 const Posts = require("../posts/posts-model");
 const Users = require("./users-model");
 const {
-  logger,
   validatePost,
   validateUser,
   validateUserId,
@@ -58,17 +57,24 @@ router.get("/:id/posts", validateUserId, async (req, res) => {
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
   let { id } = req.params;
-  let posts = await Posts.getById(id);
-  if (!posts) {
+  let posts = await Posts.get();
+  let userPosts = posts.filter((post) => post["user_id"] === +id);
+  if (!userPosts) {
     res.status(500).json({ message: "error getting posts" });
   }
-  res.status(200).json(posts);
+  res.status(200).json(userPosts);
 });
 
-router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
+router.post("/:id/posts", validateUserId, validatePost, async (req, res) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+  let { id } = req.params;
+  let newPost = await Posts.insert({ user_id: id, text: req.body.text });
+  if (!newPost) {
+    res.status(500).json({ message: "error adding new post" });
+  }
+  res.status(201).json(newPost);
 });
 
 // do not forget to export the router
