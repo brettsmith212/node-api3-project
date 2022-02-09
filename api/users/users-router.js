@@ -33,7 +33,7 @@ router.post("/", validateUser, async (req, res) => {
   if (!newUser) {
     res.status(500).json({ message: "error adding new user" });
   }
-  res.status(200).json(newUser);
+  res.status(201).json(newUser);
 });
 
 router.put("/:id", validateUserId, validateUser, async (req, res) => {
@@ -45,9 +45,15 @@ router.put("/:id", validateUserId, validateUser, async (req, res) => {
   res.status(200).json(updatedUser);
 });
 
-router.delete("/:id", validateUserId, (req, res) => {
+router.delete("/:id", validateUserId, async (req, res) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
+  let { id } = req.params;
+  let deletedUser = await Users.remove(id);
+  if (!deletedUser) {
+    res.status(500).json({ message: "error deleting user" });
+  }
+  res.status(200).json(req.user);
 });
 
 router.get("/:id/posts", validateUserId, (req, res) => {
