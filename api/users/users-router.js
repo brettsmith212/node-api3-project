@@ -2,11 +2,11 @@ const express = require("express");
 const Posts = require("../posts/posts-model");
 const Users = require("./users-model");
 const {
+  logger,
   validatePost,
   validateUser,
   validateUserId,
 } = require("../middleware/middleware");
-const res = require("express/lib/response");
 
 // You will need `users-model.js` and `posts-model.js` both
 // The middleware functions also need to be required
@@ -46,8 +46,6 @@ router.put("/:id", validateUserId, validateUser, async (req, res) => {
 });
 
 router.delete("/:id", validateUserId, async (req, res) => {
-  // RETURN THE FRESHLY DELETED USER OBJECT
-  // this needs a middleware to verify user id
   let { id } = req.params;
   let deletedUser = await Users.remove(id);
   if (!deletedUser) {
@@ -56,9 +54,15 @@ router.delete("/:id", validateUserId, async (req, res) => {
   res.status(200).json(req.user);
 });
 
-router.get("/:id/posts", validateUserId, (req, res) => {
+router.get("/:id/posts", validateUserId, async (req, res) => {
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
+  let { id } = req.params;
+  let posts = await Posts.getById(id);
+  if (!posts) {
+    res.status(500).json({ message: "error getting posts" });
+  }
+  res.status(200).json(posts);
 });
 
 router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
